@@ -12,6 +12,8 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import sorting.sortingmethods.BubbleSort;
+import sorting.sortingmethods.AbstractSort;
+import sorting.sortingmethods.InsertionSort;
 
 
 /**
@@ -21,9 +23,9 @@ import sorting.sortingmethods.BubbleSort;
 public class Sorting extends Application{
     private final int n = 50;
     private final int min = 1;
-    private final int max = 10;
-    private final int width = 900;
-    private final int height = 400;
+    private final int max = 100;
+    private final int width = 600;
+    private final int height = 430;
     private final double offset_height = height * 0.15; 
     private final double offset_width = width * 0.05;      
     private final double pixel_height = (height / 5 * 4) / (max - min + 1);
@@ -32,7 +34,7 @@ public class Sorting extends Application{
     private ArrayList<Integer> data;
     private ArrayList<Rectangle> histogram;
     private Pane root;
-    
+    private Thread t;
     
     @Override
     public void start(Stage primaryStage) {
@@ -46,27 +48,27 @@ public class Sorting extends Application{
         }
         root = new Pane();
         Scene scene = new Scene(root, width, height);
-        
+        AbstractSort sort = new InsertionSort(data, this);
         repaint();
         
         Button step = new Button("Sort step");
-        BubbleSort b = new BubbleSort(data, this);
-        Thread t = new Thread(b);
+        
+        t = new Thread(sort);
         t.start();
         step.setOnAction((ActionEvent e) -> {
-            b.stepSort();
+            sort.stepSort();
         });
         Button play = new Button("Play");
         
         step.setLayoutX(100);
         Button stop = new Button("Stop");
         stop.setOnAction((ActionEvent e) -> {
-            b.running = false;
+            sort.stop();
             root.getChildren().remove(stop);
             root.getChildren().add(play);
         });
         play.setOnAction((ActionEvent e) -> {            
-            b.running = true;
+            sort.start();
             root.getChildren().remove(play);
             root.getChildren().add(stop);
         });
@@ -76,7 +78,10 @@ public class Sorting extends Application{
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
+    @Override
+    public void stop(){
+        t.interrupt();
+    }
     private void generateNewHistogram(){
         removeRectanglesFromPane(root);
         histogram = new ArrayList();
@@ -90,7 +95,7 @@ public class Sorting extends Application{
             histogram.add(r);            
         }
     }
-    private void generateNewHistogram(int index){
+    private void generateNewHistogram(int index_one, int index_two){
         removeRectanglesFromPane(root);
         histogram = new ArrayList();
         int count = 0;
@@ -100,7 +105,7 @@ public class Sorting extends Application{
             double x = offset_width + histogram.size() * (rectangle_width + 3);
             double y = (height - offset_height * 2) + offset_height - rectangle_height;
             Rectangle r = new Rectangle(x,y,rectangle_width, rectangle_height);
-            if(count == index || count == index + 1){
+            if(count == index_one || count == index_two){
                 r.setFill(Color.RED);
             }
             else{
@@ -127,8 +132,8 @@ public class Sorting extends Application{
         generateNewHistogram();
         drawHistogramOnPane(root);
     }
-    public void repaint(int i){
-        generateNewHistogram(i);
+    public void repaint(int i, int j){
+        generateNewHistogram(i, j);
         drawHistogramOnPane(root);
     }
     public static void main(String[] args) {        

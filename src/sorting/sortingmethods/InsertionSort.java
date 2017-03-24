@@ -14,17 +14,20 @@ import sorting.Sorting;
  *
  * @author Wouter
  */
-public class BubbleSort extends AbstractSort implements Runnable{
-    private int i = 0;
+public class InsertionSort extends AbstractSort implements Runnable{
+    
     private ArrayList<Integer> data;
     private Sorting s;
+    private int i;
+    private int j;
+    private boolean inner = false;
     public boolean running = false;
     private boolean finished = false;
     private boolean foundsomething = false;
     
-    public BubbleSort(ArrayList<Integer> input_data, Sorting p){
-        data = input_data;
-        s = p;        
+    public InsertionSort(ArrayList<Integer> data_input, Sorting parent){
+        data = data_input;
+        s = parent;
     }
     @Override
     public void run() {
@@ -41,41 +44,33 @@ public class BubbleSort extends AbstractSort implements Runnable{
             }
         }
     }
-    public void stepSort(){
-        if(i >= data.size() - 1){
-            if(!foundsomething)
-                finished = true;
-            i = 0;
-            foundsomething = false;
-        }
-        if(!finished){
-            if(data.get(i) > data.get(i+1)){
-                Collections.swap(data, i, i+1);
-                foundsomething = true;
-            }
-            paintToParent(i);
-            i++;
+
+    @Override
+    public void stepSort() {
+       if(data.size() > 1 && i != data.size()){
+           if(j == 0){
+               i++;
+               j = i;
+           }
+           sort();
+       } 
+       else{
+           paintToParent();
+       }
+       
+    }
+    public void sort(){
+        if(data.get(j) < data.get(j-1)){
+            Collections.swap(data,j,j-1);
+            j--;
+            paintToParent(j);
         }
         else{
+            j = 0;
             paintToParent();
         }
         
     }
-    private void paintToParent(){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint();
-            }
-        });
-    }
-    private void paintToParent(int i){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint(i, i+1);
-            }
-        });
-    }
-
     @Override
     public void start() {
         running = true;
@@ -85,5 +80,19 @@ public class BubbleSort extends AbstractSort implements Runnable{
     public void stop() {
         running = false;
     }
-    
+    private void paintToParent(int i){
+        Platform.runLater(new Runnable(){
+            @Override public void run(){
+                s.repaint(i, i-1);
+            }
+        });
+    }
+    private void paintToParent(){
+        Platform.runLater(new Runnable(){
+            @Override public void run(){
+                s.repaint();
+            }
+        });
+    }
+
 }
