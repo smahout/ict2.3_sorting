@@ -52,14 +52,16 @@ public class InsertionSort extends AbstractSort implements Runnable{
                i++;
                j = i;
            }
-           sort();
+           else{
+                sort();
+           }
        } 
        else{
            paintToParent();
        }
        
     }
-    public void sort(){
+    private void sort(){
         if(data.get(j) < data.get(j-1)){
             Collections.swap(data,j,j-1);
             j--;

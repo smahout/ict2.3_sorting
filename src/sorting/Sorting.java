@@ -21,7 +21,7 @@ import sorting.sortingmethods.InsertionSort;
  * @author Wouter
  */
 public class Sorting extends Application{
-    private final int n = 50;
+    private final int n = 10;
     private final int min = 1;
     private final int max = 100;
     private final int width = 600;
