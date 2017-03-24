@@ -16,15 +16,13 @@ import sorting.Sorting;
  */
 public class InsertionSort extends AbstractSort implements Runnable{
     
-    private ArrayList<Integer> data;
-    private Sorting s;
     private int i;
     private int j;
-    private boolean inner = false;
     public boolean running = false;
-    private boolean finished = false;
-    private boolean foundsomething = false;
     
+    private ArrayList<Integer> data;
+    private Sorting s;
+
     public InsertionSort(ArrayList<Integer> data_input, Sorting parent){
         data = data_input;
         s = parent;
@@ -83,17 +81,13 @@ public class InsertionSort extends AbstractSort implements Runnable{
         running = false;
     }
     private void paintToParent(int i){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint(i, i-1);
-            }
+        Platform.runLater(() -> {
+            s.repaint(i, i-1);
         });
     }
     private void paintToParent(){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint();
-            }
+        Platform.runLater(() -> {
+            s.repaint();
         });
     }
 

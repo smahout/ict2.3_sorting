@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import sorting.sortingmethods.BubbleSort;
 import sorting.sortingmethods.AbstractSort;
 import sorting.sortingmethods.InsertionSort;
+import sorting.sortingmethods.QuickSort;
 
 
 /**
@@ -21,14 +22,14 @@ import sorting.sortingmethods.InsertionSort;
  * @author Wouter
  */
 public class Sorting extends Application{
-    private final int n = 10;
+    private final int n = 40;
     private final int min = 1;
-    private final int max = 100;
+    private final int max = 5000;
     private final int width = 600;
-    private final int height = 430;
+    private final int height = 400;
     private final double offset_height = height * 0.15; 
     private final double offset_width = width * 0.05;      
-    private final double pixel_height = (height / 5 * 4) / (max - min + 1);
+    private final double pixel_height = (height * 0.8) / (max - min + 1);
     private final double rectangle_width = ((width - offset_width * 2) - (n - 1) * 3) / n;
    
     private ArrayList<Integer> data;
@@ -43,7 +44,7 @@ public class Sorting extends Application{
         histogram = new ArrayList();
         int random;
         for(int i = 0; i < n; i++){
-           random = (int) Math.round(new Double(Math.random() * new Integer(max - min).doubleValue())) + min;
+           random = (int) Math.round(Math.random() * new Integer(max - min).doubleValue()) + min;
            data.add(random);
         }
         root = new Pane();

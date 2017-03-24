@@ -62,17 +62,13 @@ public class BubbleSort extends AbstractSort implements Runnable{
         
     }
     private void paintToParent(){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint();
-            }
+        Platform.runLater(() -> {
+            s.repaint();
         });
     }
     private void paintToParent(int i){
-        Platform.runLater(new Runnable(){
-            @Override public void run(){
-                s.repaint(i, i+1);
-            }
+        Platform.runLater(() -> {
+            s.repaint(i, i+1);
         });
     }
 
