@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
@@ -12,20 +11,29 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import sorting.sortingmethods.BubbleSort;
+
+
 /**
  *
  * @author Wouter
  */
-public class Sorting extends Application {
-    private final int n = 60;
+public class Sorting extends Application{
+    private final int n = 50;
     private final int min = 1;
-    private final int max = 100;
+    private final int max = 10;
     private final int width = 900;
     private final int height = 400;
+    private final double offset_height = height * 0.15; 
+    private final double offset_width = width * 0.05;      
+    private final double pixel_height = (height / 5 * 4) / (max - min + 1);
+    private final double rectangle_width = ((width - offset_width * 2) - (n - 1) * 3) / n;
    
     private ArrayList<Integer> data;
     private ArrayList<Rectangle> histogram;
     private Pane root;
+    
+    
     @Override
     public void start(Stage primaryStage) {
         // Create random list 
@@ -33,24 +41,35 @@ public class Sorting extends Application {
         histogram = new ArrayList();
         int random;
         for(int i = 0; i < n; i++){
-           random = new Double(Math.random() * new Integer(max - min).doubleValue()).intValue() + min;
+           random = (int) Math.round(new Double(Math.random() * new Integer(max - min).doubleValue())) + min;
            data.add(random);
         }
         root = new Pane();
         Scene scene = new Scene(root, width, height);
         
-        generateNewHistogram();
-        //drawHistogramOnPane(root);
+        repaint();
+        
         Button step = new Button("Sort step");
-        step.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e){
-                generateNewHistogram();
-                drawHistogramOnPane(root);
-            }
+        BubbleSort b = new BubbleSort(data, this);
+        Thread t = new Thread(b);
+        t.start();
+        step.setOnAction((ActionEvent e) -> {
+            b.stepSort();
         });
         Button play = new Button("Play");
+        
         step.setLayoutX(100);
         Button stop = new Button("Stop");
+        stop.setOnAction((ActionEvent e) -> {
+            b.running = false;
+            root.getChildren().remove(stop);
+            root.getChildren().add(play);
+        });
+        play.setOnAction((ActionEvent e) -> {            
+            b.running = true;
+            root.getChildren().remove(play);
+            root.getChildren().add(stop);
+        });
         root.getChildren().add(step);
         root.getChildren().add(play);
         primaryStage.setTitle("Sorting algorithms");
@@ -59,16 +78,8 @@ public class Sorting extends Application {
     }
 
     private void generateNewHistogram(){
-        for(Rectangle r : histogram){
-            root.getChildren().remove(r);
-        }
-        
-        double offset_height = height * 0.15; 
-        double offset_width = width * 0.05;      
-        double pixel_height = (height / 5 * 4) / (max - min);
-        double rectangle_width = ((width - offset_width * 2) - (n - 1) * 3) / n;
+        removeRectanglesFromPane(root);
         histogram = new ArrayList();
-      
         for(Integer i : data){
             double rectangle_height = pixel_height * i;
             double x = offset_width + histogram.size() * (rectangle_width + 3);
@@ -79,17 +90,51 @@ public class Sorting extends Application {
             histogram.add(r);            
         }
     }
+    private void generateNewHistogram(int index){
+        removeRectanglesFromPane(root);
+        histogram = new ArrayList();
+        int count = 0;
+        for(Integer i : data){
+            
+            double rectangle_height = pixel_height * i;
+            double x = offset_width + histogram.size() * (rectangle_width + 3);
+            double y = (height - offset_height * 2) + offset_height - rectangle_height;
+            Rectangle r = new Rectangle(x,y,rectangle_width, rectangle_height);
+            if(count == index || count == index + 1){
+                r.setFill(Color.RED);
+            }
+            else{
+                r.setFill(Color.WHITE);
+            }
+            r.setStroke(Color.RED);
+            histogram.add(r);
+            count++;
+        }
+    }
+    private void removeRectanglesFromPane(Pane p){
+        for(Rectangle r : histogram){
+            p.getChildren().remove(r);
+        }
+    }
     
     private void drawHistogramOnPane(Pane p){
         for(Rectangle r: histogram){
-            
             p.getChildren().add(r);
         }
     }
 
-
+    public void repaint(){
+        generateNewHistogram();
+        drawHistogramOnPane(root);
+    }
+    public void repaint(int i){
+        generateNewHistogram(i);
+        drawHistogramOnPane(root);
+    }
     public static void main(String[] args) {        
         launch(args);
     }
+
+    
     
 }
